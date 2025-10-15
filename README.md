@@ -49,7 +49,7 @@ This project demonstrates **secure access control**, **subnet isolation**, and *
 
 <h2 id="architecture-diagram">🏗️ Architecture Diagram</h2>
 
-![AWS VPC Architecture with Bastion Host and Private EC2](https://raw.githubusercontent.com/MaheshShukla1/aws-vpc-bastion-architecture/main/architecture.png)
+![AWS VPC Architecture with Bastion Host and Private EC2](https://raw.githubusercontent.com/MaheshShukla1/aws-vpc-bastion-architecture/main/screenshots/architecture.png)
 
 **Includes:**  
 - ✅ Custom VPC (`10.0.0.0/16`)  
