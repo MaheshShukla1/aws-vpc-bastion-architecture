@@ -1,0 +1,70 @@
+# Step 1: Create VPC
+aws ec2 create-vpc --cidr-block 10.0.0.0/16 --tag-specifications 'ResourceType=vpc,Tags=[{Key=Name,Value=project-vpc}]'
+
+# Note: Copy VPC ID from output (something like vpc-xxxxxxxx)
+
+# Step 2: Create Subnets
+aws ec2 create-subnet --vpc-id <VPC_ID> --cidr-block 10.0.1.0/24 --availability-zone ap-south-1a --tag-specifications 'ResourceType=subnet,Tags=[{Key=Name,Value=public-subnet-1}]'
+
+aws ec2 create-subnet --vpc-id <VPC_ID> --cidr-block 10.0.2.0/24 --availability-zone ap-south-1a --tag-specifications 'ResourceType=subnet,Tags=[{Key=Name,Value=private-subnet-1}]'
+
+# Note: Copy both subnet IDs from output
+
+# Step 3: Enable Public IP auto-assign on Public Subnet
+aws ec2 modify-subnet-attribute --subnet-id <PUBLIC_SUBNET_ID> --map-public-ip-on-launch
+
+# Step 4: Create and Attach Internet Gateway (IGW)
+aws ec2 create-internet-gateway --tag-specifications 'ResourceType=internet-gateway,Tags=[{Key=Name,Value=project-igw}]'
+
+# Copy IGW ID from output
+
+aws ec2 attach-internet-gateway --internet-gateway-id <IGW_ID> --vpc-id <VPC_ID>
+
+# Step 5: Create Route Tables and Routes
+aws ec2 create-route-table --vpc-id <VPC_ID> --tag-specifications 'ResourceType=route-table,Tags=[{Key=Name,Value=public-rt}]'
+
+# Copy public route table ID
+
+aws ec2 create-route-table --vpc-id <VPC_ID> --tag-specifications 'ResourceType=route-table,Tags=[{Key=Name,Value=private-rt}]'
+
+# Copy private route table ID
+
+aws ec2 create-route --route-table-id <PUBLIC_RT_ID> --destination-cidr-block 0.0.0.0/0 --gateway-id <IGW_ID>
+
+aws ec2 associate-route-table --route-table-id <PUBLIC_RT_ID> --subnet-id <PUBLIC_SUBNET_ID>
+
+aws ec2 associate-route-table --route-table-id <PRIVATE_RT_ID> --subnet-id <PRIVATE_SUBNET_ID>
+
+# Step 6: Create Security Groups
+aws ec2 create-security-group --group-name sg-bastion --description "Bastion SG" --vpc-id <VPC_ID>
+
+# Copy Bastion SG ID
+
+aws ec2 authorize-security-group-ingress --group-id <SG_BASTION_ID> --protocol tcp --port 22 --cidr <YOUR_PUBLIC_IP>/32
+
+aws ec2 authorize-security-group-ingress --group-id <SG_BASTION_ID> --protocol tcp --port 80 --cidr 0.0.0.0/0
+
+aws ec2 create-security-group --group-name sg-private --description "Private EC2 SG" --vpc-id <VPC_ID>
+
+# Copy Private SG ID
+
+aws ec2 authorize-security-group-ingress --group-id <SG_PRIVATE_ID> --protocol tcp --port 22 --source-group <SG_BASTION_ID>
+
+# Step 7: Launch Bastion EC2
+aws ec2 run-instances --image-id <AMI_ID> --count 1 --instance-type t2.micro --key-name my-key --security-group-ids <SG_BASTION_ID> --subnet-id <PUBLIC_SUBNET_ID> --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=bastion-ec2}]'
+
+# Step 8: Launch Private EC2
+aws ec2 run-instances --image-id <AMI_ID> --count 1 --instance-type t2.micro --key-name my-key --security-group-ids <SG_PRIVATE_ID> --subnet-id <PRIVATE_SUBNET_ID> --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=private-ec2}]' --no-associate-public-ip-address
+
+# Step 9: Connect via SSH
+# SSH into Bastion:
+ssh -i my-key.pem ec2-user@<BASTION_PUBLIC_IP>
+
+# From Bastion, SSH into Private EC2:
+ssh -i my-key.pem ec2-user@<PRIVATE_EC2_PRIVATE_IP>
+
+# Step 10: Install NGINX on both instances
+sudo dnf install nginx -y
+sudo systemctl enable nginx --now
+echo "Hello from <INSTANCE_NAME>" | sudo tee /usr/share/nginx/html/index.html
+curl localhost
