@@ -26,7 +26,7 @@ Perfect for **DevOps engineers, cloud learners, and AWS certification aspirants*
   - [Step 5 — Security Groups](#step-5---security-groups)  
   - [Step 6 — Launch EC2 (Bastion)](#step-6---launch-ec2-bastion)  
   - [Step 7 — Launch Private EC2](#step-7---launch-private-ec2)  
-  - [Step 8 — Install NGINX on Both](#step-8---install-nginx-on-both)  
+  - [Step 8 — Validate SSH Connectivity](#step-8---validate-connectivity)  
   - [Step 9 — Validate Setup](#step-9---validate-setup)  
   - [Step 10 — Cleanup (Avoid Charges)](#step-10---cleanup-avoid-charges)  
 - [Screenshots Guide (Filenames)](#screenshots-guide-filenames)  
@@ -72,14 +72,10 @@ This project demonstrates **secure access control**, **subnet isolation**, and *
 
 ### Bastion & Private EC2
 ![Bastion EC2](screenshots/ec2-bastion.png)  
-![Private EC2](screenshots/ec2-private.png)
+![Private EC2](screenshots/private-ssh.png)
 
 ### SSH from Bastion to Private
-![SSH Connection](screenshots/ssh-connection.png)
-
-### NGINX Output
-![NGINX Public](screenshots/nginx-public.png)  
-![NGINX Private](screenshots/nginx-private.png)
+![SSH Connection](screenshots/private-terminal.png)
 
 ---
 
@@ -202,27 +198,25 @@ ssh -i my-key.pem ec2-user@<BASTION_PUBLIC_IP>
 ssh -i my-key.pem ec2-user@<PRIVATE_EC2_IP>
 ```
 
-<h3 id="step-8---install-nginx-on-both">Step 8 — Install NGINX on Both</h3>
+
+<h3 id="step-8---validate-connectivity">Step 8 — Validate SSH Connectivity</h3>
+
+**From your Laptop → Bastion (Public EC2):**
 
 **On Bastion (Public):**
 ```
-sudo dnf install nginx -y
-sudo systemctl enable nginx --now
-echo "Hello from Bastion Host" | sudo tee /usr/share/nginx/html/index.html
-curl localhost
+chmod 400 mahesh.pem
+ssh -i mahesh.pem ec2-user@<BASTION_PUBLIC_IP>
 ```
 
 **On Private EC2:**
 
 ```
-sudo dnf install nginx -y
-sudo systemctl enable nginx --now
-echo "Hello from Private EC2" | sudo tee /usr/share/nginx/html/index.html
-curl localhost
+ssh -i mahesh.pem ec2-user@<PRIVATE_EC2_IP>
 ```
-✅ NGINX works on both machines  
-✅ Private EC2 only reachable internally (via Bastion)
-
+> ✅ Verify that you can SSH from your laptop to Bastion.  
+> ✅ Verify that you can SSH from Bastion into Private EC2.  
+> ✅ This confirms your **VPC, Subnets, Security Groups, and Bastion Host** are configured correctly.
 
 <h3 id="step-9---validate-setup">Step 9 — Validate Setup</h3>
 
@@ -256,33 +250,28 @@ Or simply delete everything via AWS Console.
 
 <h2 id="screenshots-guide-filenames">📸 Screenshots Guide (Filenames)</h2>
 
-Place these files under `screenshots/`:
-
-|Step|Filename|Description|
+|Step|Screenshot|Description|
 |---|---|---|
 |1|`vpc-created.png`|Custom VPC creation confirmed|
-|2|`subnets.png`|Both subnets with CIDRs shown|
+|2|`subnets.png` & `subnets-private.png`|Public & Private subnets with CIDRs|
 |3|`igw-attached.png`|Internet Gateway attached|
-|4|`route-table-public.png`|Public route table with IGW route|
-|4|`route-table-private.png`|Private route table without IGW route|
-|5|`security-groups.png`|SG inbound rules verified|
+|4|`route-table-public.png` & `route-table-private.png`|Public/Private route tables|
+|5|`security-groups.png` & `private-security-group.png`|Security Groups rules|
 |6|`ec2-bastion.png`|Bastion EC2 running|
-|7|`ec2-private.png`|Private EC2 running|
-|8|`ssh-connection.png`|SSH from Bastion to Private EC2|
-|9|`nginx-public.png`|NGINX on Bastion public|
-|9|`nginx-private.png`|NGINX on Private EC2|
+|7|`private-ssh.png`|Private EC2 running|
+|8|`ssh-bastion-terminal.png` & `private-terminal.png`|SSH: Laptop → Bastion → Private EC2|
 
 <h2 id="learning-outcomes">📚 Learning Outcomes</h2>
 
-|Skill|Description|
+|Feature|Description|
 |---|---|
-|🧩 VPC/Subnet Design|Building secure cloud networks|
-|🌐 Internet Gateway|Managing outbound traffic|
-|🔐 Bastion Host|Secure SSH jump box access|
-|🧱 Security Groups|Layered security configuration|
-|🛠️ Routing|Isolating private subnets|
-|⚡ NGINX Deployment|Internal and public web serving|
-|💰 Free-Tier Optimization|Smart AWS cost-saving design|
+|🟢 **Free Tier Safe**|No NAT Gateway — uses Bastion for internal access|
+|🌍 **Region**|`ap-south-1 (Mumbai)`|
+|💻 **Instances**|2× Amazon Linux 2023 (`t2.micro`)|
+|🔐 **Security**|Bastion → open only to your IP|
+|⚙️ **Networking**|Custom VPC with public/private subnets|
+|🧱 **Access**|Bastion → Private EC2 SSH only|
+|🧰 **Tools Used**|EC2, VPC, IGW, Route Tables, Security Groups, SSH|
 
 ---
 
@@ -299,8 +288,6 @@ Place these files under `screenshots/`:
 - Security Groups
     
 - SSH
-    
-- NGINX
   
 <h2 id="project-structure">📂 Project Structure</h2>
 
