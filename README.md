@@ -62,21 +62,31 @@ This project demonstrates **secure access control**, **subnet isolation**, and *
 
 <h2 id="visual-reference-screenshots">📸 Visual Reference (Screenshots)</h2>
 
-> Place your screenshots under `/screenshots` folder in the repo (case-sensitive). Example filenames used below.
-
 ### VPC Creation
 ![VPC Created](screenshots/vpc-created.png)
 
 ### Subnets
-![Subnets](screenshots/subnets.png)
+![Public & Private Subnets](screenshots/subnets.png)  
+![Private Subnet Details](screenshots/subnets-private.png)
 
-### Bastion & Private EC2
+### Internet Gateway
+![IGW Attached](screenshots/igw-attached.png)
+
+### Route Tables
+![Public Route Table](screenshots/route-table-public.png)  
+![Private Route Table](screenshots/route-table-private.png)
+
+### Security Groups
+![Security Groups Overview](screenshots/security-groups.png)  
+![Private Security Group Details](screenshots/private-security-group.png)
+
+### EC2 Instances
 ![Bastion EC2](screenshots/ec2-bastion.png)  
 ![Private EC2](screenshots/private-ssh.png)
 
-### SSH from Bastion to Private
-![SSH Connection](screenshots/private-terminal.png)
-
+### SSH Connectivity
+![Laptop → Bastion](screenshots/ssh-bastion-terminal.png)  
+![Bastion → Private EC2](screenshots/private-terminal.png)
 ---
 
 <h2 id="key-highlights">✨ Key Highlights</h2>
