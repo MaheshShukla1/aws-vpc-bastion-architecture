@@ -4,6 +4,7 @@
 [![AWS Free Tier](https://img.shields.io/badge/AWS-Free_Tier-green)](https://aws.amazon.com/free/)
 [![Architecture](https://img.shields.io/badge/Architecture-VPC%20%7C%20Bastion%20Host-blue)](#)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+![Region](https://img.shields.io/badge/Region-ap--south--1-orange)
 [![Made with ❤️ on AWS](https://img.shields.io/badge/Built_On-AWS-orange)](#)
 
 > A **hands-on, production-style AWS networking project** — build a **secure Virtual Private Cloud (VPC)** with a **public Bastion Host** to SSH into **private EC2 instances**, all within AWS **Free Tier limits**.  
